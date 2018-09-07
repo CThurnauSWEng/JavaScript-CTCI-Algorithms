@@ -396,12 +396,56 @@
             using two stacks
         */
 
-        class myQueue{
+        class QueueViaStacks{
             constructor(){
-                this.stack1 = new Stack();
-                this.stack2 = new Stack();
+                this.stackOldest = new Stack();
+                this.stackNewest = new Stack();
             }
         }
+
+        QueueViaStacks.prototype.push = function(value){
+            this.stackNewest.push(value);
+        }
+
+        QueueViaStacks.prototype.printAllStacks = function(){
+            console.log("new stack")
+            this.stackNewest.printStack();
+            console.log("old stack")
+            this.stackOldest.printStack();
+        }
+
+        QueueViaStacks.prototype.pop = function(){
+            // if there are any nodes on the old stack, then
+            // then popping will return the oldest
+            if (!this.stackOldest.head){
+                // the old stack is empty, so load it up 
+                // with all of the nodes from the new stack
+                var runner = this.stackNewest.head;
+                while(runner){
+                    this.stackOldest.push(this.stackNewest.pop());
+                    runner = runner.next;
+                }                
+            }
+            console.log("In QueueViaStacks: OldestHead => ", this.stackOldest.head, " NewestHead => ", this.stackNewest.head);
+            return this.stackOldest.pop();
+        }
+
+        var queue1 = new QueueViaStacks();
+
+        queue1.push(1);
+        queue1.push(2);
+        queue1.push(3);
+        queue1.push(4);
+        queue1.push(5);
+
+        queue1.printAllStacks();
+
+        console.log("Popping from QueueViaStacks - should get 1,2,3,4,5,6")
+        for (var i = 0; i < 5; i++){
+            console.log(queue1.pop().value);
+        }
+
+
 
 
 
