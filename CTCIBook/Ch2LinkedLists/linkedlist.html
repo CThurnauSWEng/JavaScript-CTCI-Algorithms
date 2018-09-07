@@ -1,0 +1,706 @@
+<!DOCTYPE html> 
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Template</title>
+    <script>
+        "use strict"
+        console.log("Cracking the Code Interview Chapter 2 - Linked Lists");
+        console.log("---------------------------------------------------------------------------------------------------");
+        
+        // Single Linked List
+
+        class Node{
+            constructor(value){
+                this.next  = null;
+                this.value = value;
+            }
+        }
+
+        class SLL{
+            constructor(){
+                this.head = null;
+            }
+        }
+
+        SLL.prototype.addNodeToEnd = function(value){
+            var node = new Node(value);
+            if (this.head == null){
+                this.head = node;
+            } else {
+                var runner = this.head;
+                while (runner.next != null){
+                    runner = runner.next;
+                }
+                // Will reach this point when the runner is pointing at the 
+                // last node.
+                runner.next = node;
+            }
+        } 
+        
+        SLL.prototype.addNodeToFront = function(value){
+            var node = new Node(value);
+            var temp = this.head;
+            this.head = node;
+            node.next = temp;
+        }
+        
+        SLL.prototype.printList = function(){
+            console.log("*** Here is the current list: ***");
+            var runner = this.head;
+            while(runner != null){
+                console.log("Value: ", runner.value);
+                runner = runner.next;
+            }
+        }
+
+        SLL.prototype.deleteByValue = function(value){
+            // this has a bug - given 9, 11, 13 and asked to delete 13,
+            // the 13 is not deleted
+            console.log("in delete: value passed in: ", value);
+            if (this.head == null){
+                return;
+            } else if (this.head.value == value){
+                var temp = this.head.next;
+                this.head.next = null; // flag memory to be reclaimed
+                this.head = temp;
+            } else if (this.head.next == null){
+                // only one value an it was not the one
+                return;
+            } else {
+                var runner = this.head.next;
+                var prev = this.head;
+                while(runner != null){
+                    if (runner.value == value){
+                        prev.next = runner.next;
+                        runner.next = null; // flag memory to be reclaimed
+                        break;
+                    }
+                    prev = runner;
+                    runner = runner.next;
+                }
+            }
+        }
+
+        SLL.prototype.clearList = function (){
+            var runner = this.head;
+            while(runner != null){
+                 var temp = runner;
+                 runner.next = null;
+                 runner = temp.next;
+            }
+            this.head = null;
+        }
+
+        // CTCI Chapter 2 Interview Questions: 2.1
+
+        // 1st version using a temporary data structure
+        SLL.prototype.removeDups1 = function(){
+            var runner = this.head;
+            var obj = {};
+            while (runner != null){
+                var result = obj[runner.value];
+                if (result === undefined){
+                    obj[runner.value] = "present";
+                } else {
+                    // this value is a dup
+                    sll.deleteByValue(runner.value);
+                }
+                runner = runner.next;
+            }
+        }
+
+        // 2nd version uses two runners instead of a temporary
+        // data structure -- Time complexity = n squared
+        SLL.prototype.removeDups2 = function(){
+            // fast exit if no nodes or only one node on list
+            if ((this.head != null) && (this.head.next != null)){
+                var runner1 = this.head;
+                var runner2 = this.head.next;
+                // runner2 traverses the whole list checking value
+                // against runner1 value, then runner1 advances and
+                // runner2 starts there and goes all the way through
+                
+                while(runner1 != null){
+                    while(runner2 != null){
+                        if (runner1.value == runner2.value){
+                            console.log("deleting ", runner2.value);
+                            sll.deleteByValue(runner2.value);
+                        }
+                        runner2 = runner2.next;
+                    }
+                    runner1 = runner1.next;
+                    if (runner1 == null){
+                        break;
+                    } else {
+                        runner2 = runner1.next;
+                    }
+                }   
+            }
+        }
+
+        // CTCI Chapter 2 Interview Questions: 2.2
+
+        SLL.prototype.kthToLast = function(k){
+            // Find the kth to last element in a singly linked list
+            // runner1 is initialized to point to first node
+            // runner2 is initialized to point to the kth node down
+            // the list
+            // runners are advanced in parallel until runner2 hits end
+            // runner1 will then be pointing at the kth to last
+
+            var runner1 = this.head;
+            var runner2 = this.head;
+            for (var i = 0; i < k; i++){
+                if (runner2.next != null){
+                    runner2 = runner2.next;
+                } else {
+                    return null; // list does not contain enough elements
+                }
+            }
+
+            while (runner2 != null){
+                runner1 = runner1.next;
+                runner2 = runner2.next;
+            }
+            return runner1;
+        }
+
+        // CTCI Chapter 2 Interview Questions: 2.3
+
+        // Delete Middle Node - no access to the head
+        // Approach is to copy from next node back to current etc.
+
+        SLL.prototype.removeMiddleNode= function (runner){
+            // it is invalid to call this function with the first or last nodes
+            // if called with the first node, the head would be lost because
+            // this function does not have access to the head (per the assignment)
+            // if it is called with the last node, it would not have access to the
+            // second to last node to be able to break the link
+            if (runner.next == null){
+                // input node is the last node
+                // invalid condition, cannot access the previous node
+                // to remove this one
+                console.log("invalid call to removeMiddleNode function");
+            } else {
+                while (true){
+                    runner.value = runner.next.value;
+                    if (runner.next.next == null){
+                        runner.next = null;
+                        break;
+                    } else {
+                        runner = runner.next;
+                    }
+                }
+            }
+        }
+
+        // CTCI Chapter 2 Interview Questions: 2.4
+
+        // Partition a linked list around a value x, such that all nodes less
+        // than x come before all nodes greater than x. if x is in the list
+        // it only needs to end up after the elements less than x
+
+        SLL.prototype.partition = function(value){
+            // iterate through the list
+            // put nodes with values less than the value into first new list
+            // put nodes with values equal to or greater than the value into a second new list
+            // merge the two lists
+
+            if (this.head != null){
+                var sllLow = new SLL();
+                var sllHigh = new SLL();
+
+                var runner = this.head;
+                while (runner != null){
+                    if (runner.value < value){
+                        sllLow.addNodeToEnd(runner.value);
+                    } else {
+                        sllHigh.addNodeToEnd(runner.value);
+                    }
+                    runner = runner.next;
+                }
+
+                // merge sllLow and sllHigh
+                this.head = sllLow.head;
+
+                runner = sllHigh.head;
+                while (runner != null){
+                    sllLow.addNodeToEnd(runner.value);
+                    runner = runner.next;
+                }
+                
+            }
+        }
+
+        //  CTCI Chapter 2 Interview Questions: 2.5
+
+        /*  Sum Lists: You have two numbers represented by a linked list, where
+            each node contains a single digit. The digits are stored in reverse
+            order, such that the 1's digit is at the head of the list. Write a
+            function that adds the two numbers and returns the sum as a linked list.
+
+            Example:
+            Input: ( 7 -> 1 -> 6 ) + (5 -> 9 -> 2). that is, 617 + 295 = 912, so
+            Output: 2 -> 1 -> 9
+        */
+
+        SLL.prototype.sumLists = function(sll1, sll2){
+            var num1 = 0;
+            var num2 = 0;
+            var sum = 0;
+            var runner1 = sll1.head;
+            var runner2 = sll2.head;
+            var carry = false;
+            var result = new SLL();
+
+            while (runner1 || runner2){
+                if (runner1){
+                    num1 = runner1.value;
+                    runner1 = runner1.next;
+                }
+                if (runner2){
+                    num2 = runner2.value;
+                    runner2 = runner2.next;
+                }
+                sum = num1 + num2 + carry;
+                if (sum > 10){
+                    carry = 1;
+                    sum -= 10;
+                } else {
+                    carry = 0;
+                }
+                result.addNodeToEnd(sum);
+            }
+            return result;
+        }
+
+        //  CTCI Chapter 2 Interview Questions: 2.6
+
+        //  Palindrome: Check if a linked list is a palindrome.
+
+            // see separate file: doubleLinkedList.html
+
+        //  CTCI Chapter 2 Interview Questions: 2.7
+
+        /*  Intersection: Given two (singly) linked lists, determine if the
+            two lists intersect. Return the intersecting node. Note that the
+            intersection is based on reference, not value. That is, if the kth
+            node of the first linked list is the exact same node (by reference) as
+            the jth node of the second linked list, then then are intersecting.
+        */
+
+        function hasIntersection (sll1, sll2){
+            var runner1 = sll1.head;
+            var runner2 = sll2.head;
+
+            while (runner1){
+                while(runner2){
+                    if (runner1 == runner2){
+                        console.log("found intersection: ", runner1.value, " and ", runner2.value);
+                        return true;
+                    }
+                    runner2 = runner2.next;
+                }
+                runner1 = runner1.next;
+                runner2 = sll2.head;
+            }
+            return false;
+        }
+
+        SLL.prototype.addWholeNodeToFront = function(node){
+            var temp = this.head;
+            this.head = node;
+            node.next = temp;
+        }
+
+        // Note: after reading the answers in CTCI, I see that the above function is
+        // really finding a common node, not finding an interesection. So, the following
+        // is a correct version which is based on the solution in the book.
+
+        // First we run through both lists to the end to find the tails. If the tails
+        // are the same, then it has an intersection, so now we need to find it. The
+        // same logic can be used as in the version above to find the node at which
+        // the linked lists intersect.
+
+        function findIntersection(sll1, sll2){
+            var runner1 = sll1.head;
+            var runner2 = sll2.head;
+
+            while (runner1.next){
+                runner1 = runner1.next;
+            }
+            var tail1 = runner1;
+
+            while (runner2.next){
+                runner2 = runner2.next;
+            }
+            var tail2 = runner2;
+
+            if (tail1 != tail2){
+                return null;
+            }
+            // at this point we know that both lists have the same tail
+            // now we look for the intersection - i.e. the first common node
+
+            var runner1 = sll1.head;
+            var runner2 = sll2.head;
+
+            while (runner1){
+                while(runner2){
+                    if (runner1 == runner2){
+                        console.log("found intersection: ", runner1.value, " and ", runner2.value);
+                        return runner1;
+                    }
+                    runner2 = runner2.next;
+                }
+                runner1 = runner1.next;
+                runner2 = sll2.head;
+            }
+            return null;
+
+        }
+
+
+
+
+        //  CTCI Chapter 2 Interview Questions: 2.8
+
+        /*  Loop detection: Given a circlur linked list, implement an
+            algorithm that returns the node at the beginning of the loop.
+        */
+
+        SLL.prototype.findLoopNode = function(){
+            var runner1 = this.head;
+            var runner2 = this.head.next;
+
+
+            // Move runner2 by twice as fast as runner1. When find a match,
+            // we have detected a loop, but are not positioned at the
+            // beginning of the loop. (we are supposed to return node at the 
+            // beginning of the loop)
+            // Assumption: since the description says to return a node, assuming
+            // that the comparison should be done by reference, not by value.
+            // Assumption: the list provided will have a loop
+
+            var found = false;
+
+            while (runner1 && !found){
+                for (var i = 0; i < 2; i++) {
+                    if (runner1 == runner2){
+                        found = true;
+                    }
+                    runner2 = runner2.next;
+                }
+                runner1 = runner1.next;
+            }
+            if (!found) {
+                return null;
+            }
+            
+            // Move runner1 back to the head, then advance both runners at
+            // the same pace until they meet. The meeting point will be
+            // the start of the loop.
+
+            runner1 = this.head;
+            runner2 = runner2.next;
+            while (runner1 != runner2){
+                runner1 = runner1.next;
+                runner2 = runner2.next;
+            }
+            return runner1;
+
+        }
+
+        SLL.prototype.constructLoop = function(sll){
+            var n1 = new Node(1);
+            var n2 = new Node(2);
+            var n3 = new Node(3);
+            var n10 = new Node(10);
+            var n11 = new Node(11);
+            var n12 = new Node(12);
+            var n13 = new Node(13);
+            var n14 = new Node(14);
+            var n15 = new Node(15);
+            var n16 = new Node(16);
+
+            this.head = n1;
+            n1.next = n2;
+            n2.next = n3;
+            n3.next = n10; // start of loop
+            n10.next = n11;
+            n11.next = n12;
+            n12.next = n13;
+            n13.next = n14;
+            n14.next = n15;
+            n15.next = n16;
+            n16.next = n10; // loop is connected
+        }
+
+        var sll = new SLL();
+
+        // Test cases:
+
+        sll.addNodeToEnd(3);
+        sll.addNodeToEnd(5);
+
+        console.log("Current list should be 3,5");
+        sll.printList();
+
+        sll.addNodeToEnd(7);
+        console.log("Current list should be 3,5,7");
+        sll.printList();
+
+
+        // test deleting from the middle
+        sll.deleteByValue(5);
+        console.log("Current list should be 3,7");
+        sll.printList();
+
+        // test deleting from the front
+        sll.deleteByValue(3);
+        console.log("Current list should be 7");
+        sll.printList();
+
+        // test deleting when there is only one value
+        sll.deleteByValue(7);
+        console.log("Should have an empty list");
+        sll.printList();
+        
+        // test deleting second to last node
+        sll.addNodeToEnd(11);
+        sll.addNodeToEnd(9);
+        sll.addNodeToEnd(9);
+        sll.addNodeToEnd(7);
+        console.log("Current List should be 11, 9, 9, 7");
+        sll.printList();
+        console.log("Now delete one of the 9's");
+        sll.deleteByValue(9);
+        console.log("Current List should be 11, 9, 7");
+        sll.printList();
+        
+        console.log("clearing the list");
+        sll.deleteByValue(11);
+        sll.deleteByValue(9);
+        sll.deleteByValue(7);
+        console.log("Should have an empty list");
+        sll.printList();
+
+
+
+        sll.addNodeToEnd(9);
+        sll.addNodeToEnd(11);
+        sll.addNodeToEnd(13);
+        console.log("Reloaded the list with 9, 11,13");
+        sll.printList();
+
+        console.log("test deleting from the end when there are multiple values - remove the 13");
+        sll.deleteByValue(13);
+        console.log("Current list should be 9, 11");
+        sll.printList();
+
+        console.log("********** 2.1 Remove Duplicates *****************");
+
+        console.log("test remove dups1. First, do no harm");
+        sll.removeDups1();  // should not have had any dups
+        console.log("Current list should be 9, 11");
+        sll.printList();
+
+        sll.addNodeToEnd(9);
+        console.log("Current list should be 9, 11, 9");
+        sll.printList();
+
+        sll.removeDups1();
+        console.log("Current list should be 11, 9");
+        sll.printList();
+        
+        console.log("test remove dups2. First, do no harm");
+        sll.removeDups2();  // should not have had any dups
+        console.log("Current list should be 11, 9");
+        sll.printList();
+
+        sll.addNodeToEnd(9);
+        sll.addNodeToEnd(7);
+        console.log("Current list should be 11, 9, 9, 7");
+        sll.printList();
+
+        sll.removeDups2();
+        console.log("Current list should be 11, 9, 7");
+        sll.printList();
+
+        console.log("********** 2.2 Return kth to Last *****************");
+        sll.clearList();
+        console.log("Current list should be empty");
+        sll.printList();
+        
+        for (var i = 1; i < 8; i++){
+            sll.addNodeToEnd(i);
+        }
+
+        console.log("Current list should contain 1 thru 7");
+        sll.printList();
+
+        console.log("test kth to last - should return 5");
+        console.log(sll.kthToLast(3));
+        console.log("test kth to last - should return 4");
+        console.log(sll.kthToLast(4));
+        console.log("test kth to last - should return null");
+        console.log(sll.kthToLast(9));
+        console.log("test kth to last - should return 6");
+        console.log(sll.kthToLast(2));
+        console.log("test kth to last - should return 7");
+        console.log(sll.kthToLast(1));
+
+        console.log("********** 2.3 Remove Middle Node *****************");
+        var testNode = sll.kthToLast(3);
+        console.log("testNode: ", testNode);
+        console.log("Remove the 5");
+        sll.removeMiddleNode(testNode);
+        sll.printList();
+
+        testNode = sll.kthToLast(1);
+        var testNode = sll.kthToLast(1);
+        console.log("testNode: ", testNode);
+        console.log("Remove the 7 - note this is an invalid call");
+        sll.removeMiddleNode(testNode);
+        sll.printList();
+
+        console.log("************* 2.4 Partition ***********")
+
+        // first test helper method AddNodeToFront (didn't end up using it for 2.4)
+        sll.clearList();
+        for (var i = 1; i < 5; i++){
+            sll.addNodeToFront(i);
+        }
+        console.log("Current list should be 4,3,2,1");
+        sll.printList();
+
+        sll.clearList();
+        sll.addNodeToEnd(3);
+        sll.addNodeToEnd(5);
+        sll.addNodeToEnd(8);
+        sll.addNodeToEnd(5);
+        sll.addNodeToEnd(10);
+        sll.addNodeToEnd(2);
+        sll.addNodeToEnd(1);
+        console.log("Before partitioning: List should be: 3,5,8,5,10,2,1");
+        sll.printList();
+        sll.partition(5);
+        console.log("After partitioning: List should be: 3,2,1,5,8,5,10");
+        sll.printList();
+
+        console.log("************** 2.5 Sum Lists ***************");
+
+        var sll3 = new SLL();
+        var sll4 = new SLL();
+
+        sll3.addNodeToEnd(7);
+        sll3.addNodeToEnd(1);
+        sll3.addNodeToEnd(6);
+
+        sll4.addNodeToEnd(5);
+        sll4.addNodeToEnd(9);
+        sll4.addNodeToEnd(2);
+
+        console.log("input list 1: ");
+        sll3.printList();
+        console.log("input list 2: ");
+        sll4.printList();
+
+        var result = sll.sumLists(sll3,sll4);
+        console.log("sum: ");
+        result.printList();
+
+
+        console.log("************** 2.7 Intersection ***************");
+
+        // case one: has intersection in middle
+
+        var n1 = new Node(42);
+
+        var sll5 = new SLL();
+        var sll6 = new SLL();
+
+        for (var i = 0; i < 4; i++){
+            sll5.addNodeToEnd(i);
+            sll6.addNodeToEnd(i);
+        }
+
+        sll5.addWholeNodeToFront(n1);
+        sll5.addNodeToFront(18);
+        sll6.addWholeNodeToFront(n1);
+
+        for (var i = 99; i < 103; i++){
+            sll5.addNodeToFront(i);
+            sll6.addNodeToFront(i);
+        }
+
+        sll5.printList();
+        sll6.printList();
+       
+        console.log("version1: sll5 has interestion with sll6? => ", hasIntersection(sll5,sll6), " *** should be true ***");
+        console.log("version2: sll5 has interestion with sll6? => ", findIntersection(sll5,sll6), " *** should be 42 ***");
+
+        // case two: does not have intersection in middle
+
+        sll5.clearList();
+        sll6.clearList();
+
+        for (var i = 0; i < 8; i++){
+            sll5.addNodeToEnd(i);
+            sll6.addNodeToEnd(i);
+        }
+
+        console.log("version1: sll5 has interestion with sll6? => ", hasIntersection(sll5,sll6), " *** should be false ***");
+        console.log("version2: sll5 has interestion with sll6? => ", findIntersection(sll5,sll6), " *** should be null ***");
+
+        // case three: intersection at first node
+
+        sll5.addWholeNodeToFront(n1);
+        sll6.addWholeNodeToFront(n1);
+
+        console.log("version1: sll5 has interestion with sll6? => ", hasIntersection(sll5,sll6), " *** should be true ***");
+        console.log("version2: sll5 has interestion with sll6? => ", findIntersection(sll5,sll6), " *** should be 42 ***");
+
+        // case four: interesection at first node on sll5 and middle node on sll6
+
+        sll5.clearList();
+        sll6.clearList();
+
+        sll5.addWholeNodeToFront(n1);
+
+        for (var i = 0; i < 8; i++){
+            sll5.addNodeToEnd(i);
+            sll6.addNodeToEnd(i);
+        }
+
+        sll6.addWholeNodeToFront(n1);
+
+        for (var i = 100; i < 108; i++){
+            sll6.addNodeToFront(i);
+        }
+
+        console.log("version1: sll5 has interestion with sll6? => ", hasIntersection(sll5,sll6), " *** should be true ***");
+        console.log("version2: sll5 has interestion with sll6? => ", findIntersection(sll5,sll6), " *** should be 42 ***");
+
+        // note: there are other possible test cases, but I'm moving on to the next exercies now
+
+        console.log("************** 2.7 Intersection ***************");
+
+        var sll7 = new SLL();
+        sll7.constructLoop();
+    
+        console.log("loop found at node: ", sll7.findLoopNode(), " should be 10");
+
+
+
+
+        
+
+
+    </script>
+  </head>
+  <body>
+    <p>See Console for output</p>
+ </body>
+</html>
