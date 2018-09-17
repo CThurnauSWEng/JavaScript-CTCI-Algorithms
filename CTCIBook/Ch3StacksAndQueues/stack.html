@@ -458,6 +458,33 @@
             push, pop, peek, and isEmpty.
         */
 
+        Stack.prototype.sort = function(){
+            // this method uses selection sort
+            // it passes all the way through the stack and finds the max
+            // it then pushes the max onto a temporary stack and pops it
+            // off the main stack (by adjusting the pointers manually)
+            // then, it repeats the passes until the original stack is empty.
+            // at this point the temp stack has sorted values. Since temp
+            // is a LIFO list, the head will point to the min.
+            // the head for the original stack is set to point to the temp stack.
+
+            var sortedStack = new Stack();
+            var OuterRunner = this.head;
+            var InnerRunner = this.head;
+            var maxNode = this.head;
+
+            while (OuterRunner){
+                while (InnerRunner){
+                    if (this.value > maxNode.value){
+                        
+                    }
+                    InnerRunner = InnerRunner.next;
+                }
+
+                OuterRunner = OuterRunner.next;
+            }
+        }
+
 
 
         //  CTCI Chapter 3 Interview Questions: 3.5 - Animal Shelter
