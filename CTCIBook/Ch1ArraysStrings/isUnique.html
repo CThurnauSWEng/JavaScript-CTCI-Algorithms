@@ -1,0 +1,77 @@
+<!DOCTYPE html> 
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Template</title>
+    <script>
+        "use strict"
+        console.log("Cracking the Code Interview Chapter 1 - Arrays and Strings");
+        console.log("---------------------------------------------------------------------------------------------------");
+
+        /* Implement an algorithm to determine if a string has all unique
+        characters. */
+
+        // first version - use additional data structure
+        function isUnique(myStr){
+            let tempObj = {};
+            for (let i = 0; i < myStr.length; i++){
+                if (tempObj[myStr[i]]){
+                    // this key exists, must be dup character
+                    return false;
+                } else {
+                    tempObj[myStr[i]] = "exists";
+                }
+            }
+            return true;
+        }
+
+        // second version - do not use an additional data structure
+
+        function isUnique2(myStr){
+            for (var i = 0; i < myStr.length; i++){
+                for (var j = 0; j < myStr.length; j++){
+                    if (i != j){
+                        if (myStr[i] == myStr[j]){
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        // test 'em
+
+        console.log("The following should be false:")
+
+        console.log('hello', isUnique('hello'));
+        console.log('hello', isUnique2('hello'));
+
+        console.log('aa', isUnique('aa'));
+        console.log('aa', isUnique2('aa'));
+
+        console.log('aab', isUnique('aa'));
+        console.log('aab', isUnique2('aa'));
+
+        console.log('qwertyy', isUnique('aa'));
+        console.log('qwertyy', isUnique2('aa'));
+
+
+        console.log('*******');
+        console.log("The following should be true");
+
+        console.log('qwerty', isUnique('qwerty'));
+        console.log('qwerty', isUnique2('qwerty'));
+
+        console.log('', isUnique(''));
+        console.log('', isUnique2(''));
+
+        console.log('q', isUnique('q'));
+        console.log('q', isUnique2('q'));
+
+
+    </script>
+  </head>
+  <body>
+    <p>See Console for output</p>
+ </body>
+</html>
