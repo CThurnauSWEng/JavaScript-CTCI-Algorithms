@@ -1,0 +1,46 @@
+<!DOCTYPE html> 
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>CTCI Book Algorithm Test</title>
+    <script>
+        "use strict"
+        console.log("Cracking the Code Interview Chapter 1 - Arrays and Strings");
+        console.log("---------------------------------------------------------------------------------------------------");
+
+        console.log("URLify");
+
+        /* Write a method to replace all spaces in a string with '%20'.
+           Note: since strings are immutable, I could either build a new string
+           or I could use an array of characters. I think easiest is to build new string.
+           Since URL are not typically horrendously long, it seems reasonable
+           to create a new string.
+        */
+
+        function URLify(strIn){
+            let strOut = "";
+            for (let i = 0; i < strIn.length; i++){
+                if(strIn[i] == ' '){
+                    strOut += '%20';
+                } else {
+                    strOut += strIn[i];
+                }
+            }
+            console.log(" In: ", strIn);
+            console.log("Out: ", strOut);
+            return strOut;
+        }
+
+        URLify("Hello, Old Friend");
+        URLify("Hello,OldFriend");
+        URLify(" 1 1 1 ");
+        URLify(" 1 ");
+        URLify(" ");
+        URLify("");
+
+    </script>
+  </head>
+  <body>
+    <p>See Console for output</p>
+ </body>
+</html>

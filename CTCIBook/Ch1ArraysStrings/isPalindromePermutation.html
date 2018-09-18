@@ -1,0 +1,84 @@
+<!DOCTYPE html> 
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>CTCI Book Algorithm Test</title>
+    <script>
+        "use strict"
+        console.log("Cracking the Code Interview Chapter 1 - Arrays and Strings");
+        console.log("---------------------------------------------------------------------------------------------------");
+
+        /* Given a string, write a function to check if it is a permutation
+           of a palindrome. */
+
+        /* A palindrome would have an even number of each 'valid' character and possibly
+           one left over if there are an uneven number. */
+
+        function isValid(char){
+          if ((char == ' ') ||
+              (char == '.') ||
+              (char == ',') ||
+              (char == '/') ||
+              (char == '?')){
+            return false;
+          } else {
+            return true;
+          }
+        }
+
+        function isPalPerm(myStr){
+          let tempObj = {};
+          for (let i = 0; i < myStr.length; i++){
+            if (isValid(myStr[i])){ //ignore spaces, etc.
+              if (tempObj[myStr[i]]){
+                // this key exists, increment it
+                tempObj[myStr[i]]++;
+              } else {
+                tempObj[myStr[i]] = 1;
+              }
+            }
+          }
+          let foundOne = false;
+          for (let key in tempObj){
+            // one (and only one) key can have value of 1 to match criteria
+            // all other keys must have values which are even numbers
+            if (tempObj[key] == 1){
+              if (foundOne) {
+                // just found a second '1', so not a palindrome permutation
+                return false;
+              } else {
+                foundOne = true;
+              }
+            } else {  // not a '1', check if even
+              if ((tempObj[key] % 2) != 0 ){
+                return false;
+              }
+            }
+          }
+          return true;
+        }
+
+        console.log("****** These should be true: ");
+        console.log(isPalPerm("tacocat"));
+        console.log(isPalPerm("tacoocat"));
+        console.log(isPalPerm("a"));
+        console.log(isPalPerm(",aa"));
+        console.log(isPalPerm("aabb!???,"));
+        console.log(isPalPerm(" a,b/a"));
+        console.log(isPalPerm("a??/ ,a"));
+
+
+        console.log("****** These should be false: ");
+        console.log(isPalPerm("aabc"));
+        console.log(isPalPerm(" brgjeiorgjw;o"));
+        console.log(isPalPerm("awrgeseth   !@#$%^&*("));
+        console.log(isPalPerm("ab"));
+        console.log(isPalPerm("??ab,,,"));
+
+
+    </script>
+  </head>
+  <body>
+    <p>See Console for output</p>
+ </body>
+</html>

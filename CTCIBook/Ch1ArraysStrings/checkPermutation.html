@@ -1,0 +1,55 @@
+<!DOCTYPE html> 
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Template</title>
+    <script>
+        "use strict"
+        console.log("Cracking the Code Interview Chapter 1 - Arrays and Strings");
+        console.log("---------------------------------------------------------------------------------------------------");
+
+        console.log("Check Permutations");
+
+        /* Given two strings, write a method to determine if one string
+           is  a permutation of another */
+        
+        /* I am assuming this means that the same exact characters are
+           present in the sting, but in a different order */
+        
+        function isPermutation(arr1, arr2){
+
+            if (arr1.length != arr2.length) return false;
+
+            if (arr1.length < 1) return true;
+
+            for (var i = 0; i < arr1.length; i++){
+                if (!arr2.includes(arr1[i])) return false;
+            }
+
+            return true;
+        }
+
+        console.log("*** These should be true ***");
+        console.log(isPermutation("hello","olleh"));
+        console.log(isPermutation("qwertyuiop","poiuytrewq"));
+        console.log(isPermutation("h","h"));
+        console.log(isPermutation("hello","olleh"));
+        console.log(isPermutation("",""));
+        console.log(isPermutation("123$%^","^%$321"))
+
+
+        console.log("*** These should be false ****");
+        console.log(isPermutation("hello","hi"));
+        console.log(isPermutation("qwerty","qwerth"));
+        console.log(isPermutation("awerty","qwerty"));
+        console.log(isPermutation("1",""));
+        console.log(isPermutation("","32"));
+        console.log(isPermutation("","2"));
+
+
+    </script>
+  </head>
+  <body>
+    <p>See Console for output</p>
+ </body>
+</html>
